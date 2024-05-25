@@ -12,7 +12,7 @@ const Exercise = new mongoose.Schema({
     require: true,
   },
   date: {
-    type: Date,
+    type: String,
     default: () => new Date(Number(Date.now())).toDateString(),
   },
 });

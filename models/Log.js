@@ -9,7 +9,7 @@ const Log = new mongoose.Schema({
       description: String,
       duration: Number,
       date: {
-        type: Date,
+        type: String,
         default: () => new Date(Number(Date.now())).toDateString(),
       },
     },
