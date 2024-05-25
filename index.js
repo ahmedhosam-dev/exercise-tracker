@@ -72,7 +72,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     date: userDate,
   });
 
-  // newExercies.save();
+  newExercies.save();
 
   if ((await Log.findById(req.params._id)) === null) {
     const newLog = new Log({
