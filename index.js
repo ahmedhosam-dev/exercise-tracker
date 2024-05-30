@@ -37,7 +37,6 @@ app.get("/api/hello", (req, res) => {
 // User api
 app.get("/api/users", async (req, res) => {
   let allUsers = await User.find({});
-  console.log(allUsers);
   res.status(200).json(allUsers);
 });
 
@@ -56,28 +55,29 @@ app.post("/api/users", (req, res) => {
 
 // Exercises
 app.post("/api/users/:_id/exercises", async (req, res) => {
-  const userName = await User.findById(req.params._id);
+  const user = await User.findById(req.params._id);
   let userDate = req.body.date;
 
   if (req.body.date) {
     let date = req.body.date.split("-");
-    userDate = new Date(date[0], date[1] - 1, date[2]).toDateString();
+    userDate = new Date(date[0], date[1] - 1, date[2]);
   }
 
   const newExercies = new Exercise({
-    _id: req.params._id,
-    username: userName.username,
+    user: req.params._id,
+    username: user.username,
     description: req.body.description,
     duration: req.body.duration,
     date: userDate,
   });
 
-  newExercies.save();
+  await newExercies.save();
 
-  if ((await Log.findById(req.params._id)) === null) {
+  const checkLog = await Log.find({ user: req.params._id });
+  if (checkLog.length <= 0) {
     const newLog = new Log({
-      _id: req.params._id,
-      username: userName.username,
+      user: req.params._id,
+      username: user.username,
       count: 1,
       log: [
         {
@@ -88,29 +88,105 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       ],
     });
 
-    newLog.save();
+    await newLog.save();
+
+    return res.json({
+      _id: user._id,
+      username: user.username,
+      description: newExercies.description,
+      duration: newExercies.duration,
+      date: newExercies.date.toDateString()
+    });
   }
 
-  const log = await Log.findById(req.params._id);
-  log.count += 1;
-  log.log.push({
+  const updateLog = await Log.findOne({ user: req.params._id });
+  updateLog.count += 1;
+  updateLog.log.push({
     description: req.body.description,
     duration: req.body.duration,
     date: userDate,
+  })
+
+  updateLog.save()
+
+  return res.json({
+    _id: user._id,
+    username: user.username,
+    description: newExercies.description,
+    duration: newExercies.duration,
+    date: newExercies.date.toDateString()
   });
-
-  log.save();
-
-  res.json(newExercies);
 });
 
 // Log
 app.get("/api/users/:_id/logs", async (req, res) => {
-  if ((await Log.findById(req.params._id)) === null)
-    return res.status(500).json({ error_message: "User not found!" });
+  const userId = req.params._id;
+  const { from, to, limit } = req.query;
 
-  const log = await Log.findById(req.params._id);
-  res.status(200).json(log);
+  try {
+    const userFound = await User.findById(userId);
+
+    if (!userFound) {
+      res.json({ Error: "User Id not valid" });
+    }
+
+    let dateObj = {};
+
+    if (from) {
+      dateObj["$gte"] = new Date(from);
+    }
+
+    if (to) {
+      dateObj["$lte"] = new Date(to);
+    }
+
+    let filter = {
+      user: userId,
+    };
+
+    if (from || to) {
+      filter.date = dateObj;
+    }
+
+    let exercises;
+
+    if (limit) {
+      exercises = await Exercise.find(filter).limit(+limit ?? 300);
+    } else {
+      exercises = await Exercise.find(filter);
+    }
+
+    const logData = [];
+
+    for (let i = 0; i < exercises.length; i++) {
+      const exerciseData = {
+        description: exercises[i].description,
+        duration: exercises[i].duration,
+        date: exercises[i].date.toDateString(),
+      };
+
+      logData.push(exerciseData);
+    }
+
+    console.log({
+      username: userFound.username,
+      count: exercises.length,
+      _id: userFound._id,
+      log: logData,
+    })
+    
+    res.json({
+      username: userFound.username,
+      count: exercises.length,
+      _id: userFound._id,
+      log: logData,
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    res.json({ Error: err });
+  }
 });
 
 // Listener

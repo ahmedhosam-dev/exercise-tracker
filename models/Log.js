@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 // Log Schema
 const Log = new mongoose.Schema({
+  userid: mongoose.Types.ObjectId,
   username: String,
   count: Number,
   log: [
@@ -9,8 +10,8 @@ const Log = new mongoose.Schema({
       description: String,
       duration: Number,
       date: {
-        type: String,
-        default: () => new Date(Number(Date.now())).toDateString(),
+        type: Date,
+        default: () => new Date(Number(Date.now())),
       },
     },
   ],

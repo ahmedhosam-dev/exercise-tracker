@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 // Exercise Schema
 const Exercise = new mongoose.Schema({
+  userid: mongoose.Types.ObjectId,
   username: String,
   description: {
     type: String,
@@ -12,8 +13,8 @@ const Exercise = new mongoose.Schema({
     require: true,
   },
   date: {
-    type: String,
-    default: () => new Date(Number(Date.now())).toDateString(),
+    type: Date,
+    default: () => new Date(Number(Date.now())),
   },
 });
 
