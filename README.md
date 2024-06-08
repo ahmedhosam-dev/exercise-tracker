@@ -16,8 +16,8 @@ GET [hostname:port]/api/users
 
 ```json
 {
-    _id: <user id>,
-    username: <user name | strint>,
+  "_id": "user id",
+  "username": "user name | strint"
 }
 ```
 
@@ -29,7 +29,7 @@ POST [hostname:posrt]/api/users
 
 ```json
 {
-    username: <user name | string>
+  "username": "user name | string"
 }
 ```
 
@@ -49,22 +49,22 @@ POST [hostname:port]/api/:_id/exercises
 
 ```json
 {
-    user: <user id>,
-    username: <user name>,
-    description: <description of exercise>,
-    duration: <duration>,
-    date: <date time>
+  "user": "user id",
+  "username": "user name",
+  "description": "description of exercise",
+  "duration": "duration",
+  "date": "date time"
 }
 ```
 
 Example output:
 
 ```json
-    _id: <user id>,
-    username: <user name>,
-    description: <description>,
-    duration: <duration>,
-    date: <date time>
+    "_id": "user id",
+    "username": "user name",
+    "description": "description",
+    "duration": "duration",
+    "date": "date time"
 ```
 
 ---
@@ -78,9 +78,9 @@ GET [hostname:port]/api/users/:_id/logs
 ```
 
 ```json
-    username: <user name>,
-    count: <number of exercise>,
-    _id: <user id>,
-    log: <all exercises>
+    "username": "user name",
+    "count": "number of exercise",
+    "_id": "user id",
+    "log": "all exercises"
 ```
 
